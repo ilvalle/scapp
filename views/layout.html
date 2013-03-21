@@ -64,6 +64,7 @@
     <div class="flash">{{=response.flash or ''}}</div>
     <div class="navbar-inner">
       <div class="container">
+		<ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
         <div class="">
           {{if response.menu:}}
           {{=MENU(response.menu, _class='nav', mobile=False, li_class='dropdown', ul_class='dropdown-menu', li_active='active')}}
@@ -72,7 +73,7 @@
       </div>
     </div>
   </div><!--/top navbar -->
-
+	<header class="mastheader" id="header"></header>
   
   <!--header class="mastheader" id="header">
     <div class='container'>
@@ -100,8 +101,8 @@
             {{end}}
         </div>
         {{pass}}
-
-        {{include}}
+	
+        <div class="span12">{{include}}</div>
       
         {{if right_sidebar_enabled:}}
         <div class="span3">

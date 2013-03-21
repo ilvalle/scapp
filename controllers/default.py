@@ -4,8 +4,15 @@ def user(): return dict(form=auth())
 def download(): return response.download(request,db)
 def call(): return service()
 ### end requires
+
 def index():
-    return dict()
+	return redirect(URL(c='plugin_cs_monitor', f='index'))
+
+def login():
+	return response.render('default/login.html', form=auth.login())
+
+def register():
+	return  
 
 def error():
     return dict()
