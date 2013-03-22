@@ -21,7 +21,7 @@ response.files.append(URL('static', 'plugin_cs_monitor/js/jqplot/plugins/jqplot.
 
 ##Configure start
 sc_cache = cache.ram
-GROUPING_MODE = 'python' # or 'python'
+GROUPING_MODE = 'database' # or 'python'
 ANALYZE_CACHE_TIME = 60
 TASKS_SUMMARY_CACHE_TIME = 10
 ##Configure end
@@ -134,6 +134,17 @@ def tactions():
             session.flash = "%s tasks successfully requeued" % (len(requeued))
         else:
             session.flash = "Cloning failed"
+    elif action == 'stop':
+        stopped = []
+        tasks = dbs(st.id.belongs(t)).select()
+        for row in tasks:
+            res = s.stop_task(row.id)
+            if res == 1:
+                stopped.append(res)
+        if stopped:
+            session.flash = "%s tasks successfully stopped" % (len(stopped))
+        else:
+            session.flash = "Stopping failed"
 
     redirect(default)
 
@@ -259,15 +270,27 @@ def run_traceback():
 @auth.requires_signature()
 def edit_task():
     task_id = request.args(0)
-    if not task_id:
+    if task_id is None:
+        return ''
+    try:
+        task_id = int(task_id)
+    except:
         return ''
     task = dbs(st.id == task_id).select().first()
-    if not task:
+
+    if not task and task_id != 0:
         return ''
     if request.args(1) == 'delete':
         task.delete_record()
         session.flash = 'Task deleted correctly'
         redirect(URL('index'))
+    elif request.args(1) == 'stop':
+        rtn = s.stop_task(task.id)
+        if rtn == 1:
+            session.flash = 'Task stopped'
+        else:
+            session.flash = 'Nothing to do...'
+        redirect(URL('task_details', args=task.id, user_signature=True))
     elif request.args(1) == 'clone':
         result = requeue_task(st, task)
         if result:
@@ -277,13 +300,17 @@ def edit_task():
             session.flash = 'Task clone failed'
             redirect(URL('edit_task', args=task_id, user_signature=True))
     elif request.args(1) == 'new':
-        st.function_name.default = task.function_name
-        st.task_name.default = task.task_name
-        st.group_name.default = task.group_name
+        if task_id != 0:
+            st.function_name.default = task.function_name
+            st.task_name.default = task.task_name
+            st.group_name.default = task.group_name
         task = None
     form = SQLFORM(st, task, formstyle=mybootstrap)
     if form.process().accepted:
-        response.flash = 'Updated correctly'
+        if request.args(1) == 'new':
+            response.flash = 'Task created correctly'
+        else:
+            response.flash = 'Updated correctly'
     elif form.errors:
         response.flash = 'Errors detected'
     return dict(form=form, task=task)
