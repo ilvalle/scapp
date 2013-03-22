@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 ### required - do no delete
-def user(): return dict(form=auth())
+
 def download(): return response.download(request,db)
 def call(): return service()
 ### end requires
 
 def index():
 	return redirect(URL(c='plugin_cs_monitor', f='index'))
-
-def login():
-	return response.render('default/login.html', form=auth.login())
-
-def register():
-	return  
 
 def error():
     return dict()
@@ -34,3 +28,7 @@ def test_rest():
 
 	return data
 
+def user(): 
+	if not request.args(0) or request.args(0) in ['login']:
+		response.view = 'default/%s.html' % request.args(0) or 'login'
+	return dict(form=auth())
