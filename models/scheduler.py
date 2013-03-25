@@ -3,9 +3,9 @@ scheduler = Scheduler(db)
 
 import urllib2
 
-def test_rest():
+def rest_getParkingIds():
 	base = 'http://ipchannels.integreen-life.bz.it/parkingFrontEnd'
-	function = '/rest/parking-ids'
+	function = '/rest/getParkingIds'
 
 	url = base + function
 	request = urllib2.Request(url)
@@ -13,7 +13,3 @@ def test_rest():
 	
 	return data
 
-
-def test_rest2():
-	semantic_error = a + b	
-	return data
