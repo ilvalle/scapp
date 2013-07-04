@@ -9,7 +9,8 @@
 ## be redirected to HTTPS, uncomment the line below:
 # request.requires_https()
 
-db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
+#db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
+db = DAL('postgres://web2py:web2py@localhost:5432/postgis', pool_size=3, check_reserved=['all'])
 
 # response.optimize_css = 'concat,minify,inline'
 # response.optimize_js = 'concat,minify,inline'
@@ -19,7 +20,7 @@ auth = Auth(db)
 service, plugins = Service(), PluginManager()
 
 ## create all tables needed by auth if not custom tables
-auth.define_tables(username=False, signature=False)
+auth.define_tables(username=False, signature=False, migrate=False)
 
 ## configure email
 mail = auth.settings.mailer
@@ -31,7 +32,7 @@ mail.settings.sender = 'project@integreen-life.bz.it'
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
-auth.settings.actions_disabled.append('register')
+#auth.settings.actions_disabled.append('register')
 
 db.auth_user.email.widget = lambda f,v: SQLFORM.widgets.string.widget(f, v,_placeholder=T('Email'), _class="input-block-level")
 db.auth_user.password.widget = lambda f,v: SQLFORM.widgets.string.widget(f, v, _placeholder=T('Password'), _class="input-block-level", _type="password")
